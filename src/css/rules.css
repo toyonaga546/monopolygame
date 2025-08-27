@@ -30,7 +30,8 @@ h1 {
 
 .back-button {
     display: block;
-    margin: 20px auto;
+    width: 80vh;
+    margin: 40px auto;
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
