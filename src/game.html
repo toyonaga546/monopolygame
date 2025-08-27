@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モノポリーゲーム</title>
+    <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+    <h1>モノポリー ゲーム画面</h1>
+    <div id="boardArea">
+        <div id="currentTurn" style="font-size:1.2em; font-weight:bold; margin-bottom:10px;"></div>
+        <div id="monopolyBoard" style="position:relative; width:600px; height:600px; margin:auto;">
+            <svg id="boardCircle" width="600" height="600" style="position:absolute; top:0; left:0;"></svg>
+        </div>
+        <div id="players"></div>
+        <div id="properties"></div>
+        <div id="gameInfo"></div>
+        <div id="gameActions" style="margin:20px;">
+            <button id="rollDiceBtn">サイコロを振る</button>
+            <button id="buyPropertyBtn">物件購入</button>
+            <button id="passBtn">パス</button>
+            <button id="negotiateBtn">交渉</button>
+        </div>
+    </div>
+    <script src="js/game-setup.js"></script>
+    <script src="js/game-core.js"></script>
+    <script src="js/game-ui.js"></script>
+</body>
+</html>

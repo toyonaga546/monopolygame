@@ -1,0 +1,144 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+#boardArea {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 20px;
+    padding-bottom: 80px;
+}
+
+#boardImg {
+    max-width: 90vw;
+    height: auto;
+    border: 2px solid #333;
+}
+
+#players {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.player {
+    background-color: #fff;
+    border: 1px solid #333;
+    border-radius: 5px;
+    padding: 10px;
+    width: 150px;
+    text-align: center;
+}
+
+#gameInfo {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #333;
+    border-radius: 5px;
+    width: 80%;
+    text-align: left;
+}
+
+#monopolyBoard {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+
+#boardCircle {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.cell-label {
+    font-size: 0.7em;
+    font-weight: bold;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+.board-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.board-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 角ごとに絶対配置で四角形を作る */
+.board-row:first-of-type {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.board-column:nth-of-type(1) {
+    position: absolute;
+    left: calc(90px * 7 + 16px);
+    top: 90px;
+}
+.board-row:nth-of-type(2) {
+    position: absolute;
+    top: calc(90px * 8 + 16px);
+    left: 0;
+}
+.board-column:nth-of-type(2) {
+    position: absolute;
+    left: 0;
+    top: 90px;
+}
+
+.cell {
+    width: 90px;
+    height: 90px;
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    font-weight: bold;
+    margin: 2px;
+    border-radius: 8px;
+}
+
+.brown { background: #a0522d; color: #fff; }
+.lightblue { background: #87ceeb; color: #222; }
+.red { background: #e74c3c; color: #fff; }
+.blue { background: #3498db; color: #fff; }
+.railroad { background: #fff; color: #222; }
+.utility { background: #e817f7; color: #222; }
+.yellow { background: #ffe066; color: #222; }
+.green { background: #27ae60; color: #fff; }
+.orange { background: #ff9800; color: #fff; }
+.pink { background: #ff69b4; color: #fff; }
+.white { background: #fff; color: #222; }
+
+/* #gameActionsの位置を盤面下に固定し、十分な余白を追加 */
+#gameActions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 60px; /* 盤面との距離を広げる */
+    margin-bottom: 20px;
+}
+
+#nextTurnBtn {
+    display: block;
+    margin: 0 auto 30px auto;
+}
