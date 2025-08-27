@@ -5,9 +5,14 @@ function drawCircleBoard() {
     const svg = document.getElementById('boardCircle');
     if (!svg) return;
     svg.innerHTML = '';
-    const radius = 240;
-    const centerX = 300;
-    const centerY = 300;
+    // SVGのサイズをさらに拡大して表示範囲を広げる（位置はそのまま）
+    svg.setAttribute('width', 1200);
+    svg.setAttribute('height', 755);
+    const offsetX = 40;
+    const offsetY = -70; // 全体的に下げる
+    const radius = 340; // 以前より+100px拡大
+    const centerX = 450 + offsetX; // SVGの中心も拡大
+    const centerY = 450 + offsetY;
     // マス目リストを拡張
     const boardCells = [
         { name: 'スタート', color: 'white' },
@@ -144,6 +149,25 @@ function drawCircleBoard() {
     }
 }
 
+// サイコロを振れるかどうか判定
+function canRollDice() {
+    // 購入フェーズ中はサイコロ不可
+    return !(typeof purchasePhase !== 'undefined' && purchasePhase);
+}
+
+// 物件購入ボタンを有効化するか判定
+function canBuyProperty() {
+    // 物件購入フェーズ中のみ
+    if (!(typeof purchasePhase !== 'undefined' && purchasePhase)) return false;
+    const player = players[currentPlayerIndex];
+    // gameBoardから購入可能な物件があるか判定
+    return gameBoard.some(property =>
+        property.owner === null &&
+        property.price > 0 &&
+        !player.properties.some(pr => pr.color === property.color)
+    );
+}
+
 function updateActionButtons() {
     // サイコロを振る: プレイヤーのターン開始時のみ
     const rollDiceBtn = document.getElementById('rollDiceBtn');
@@ -213,23 +237,31 @@ function renderPropertySelect() {
             "Railroad Company 1": "鉄道会社1",
             "Railroad Company 2": "鉄道会社2",
             "Railroad Company 3": "鉄道会社3",
+            "Railroad Company 4": "鉄道会社4",
+            "Electric Company": "電力会社",
+            "Water Works": "水道局",
             "Jail": "刑務所",
             "Start": "スタート",
             "Tax": "所得税",
             "Luxury Tax": "贅沢税",
             "Chance": "チャンス",
-            "Community Chest": "共同基金",
-            "Electric Company": "電力会社"
+            "Community Chest": "共同基金"
         };
         const select = document.createElement('select');
         select.id = 'propertySelect';
-        gameBoard.forEach(property => {
-            const canBuy = property.owner === null && property.price > 0 && !player.properties.some(pr => pr.color === property.color);
+        // nameMapのキーをすべて走査し、gameBoardに存在しない場合は仮の物件として追加
+        Object.entries(nameMap).forEach(([engName, jpName], idx) => {
+            // gameBoardから該当物件を探す
+            let property = gameBoard.find(p => p.name === engName || jpName === p.name);
+            let canBuy = false;
+            if (property) {
+                // 本物件: 未購入かつ同色未所持なら購入可能
+                canBuy = property.owner === null && property.price > 0 && !player.properties.some(pr => pr.color === property.color);
+            }
+            // 仮物件は購入不可
             const option = document.createElement('option');
-            option.value = property.index;
-            // 日本語名があればそれを使う
-            const jpName = nameMap[property.name] || property.name;
-            option.textContent = `${jpName} (${property.price > 0 ? property.price + '万円' : '購入不可'})`;
+            option.value = property ? property.index : (gameBoard.length + idx);
+            option.textContent = `${jpName} (${property && property.price > 0 ? property.price + '万円' : '購入不可'})`;
             if (!canBuy) option.disabled = true;
             select.appendChild(option);
         });
@@ -248,9 +280,7 @@ if (buyPropertyBtn) {
                 alert('購入可能な物件がありません。パスします。');
                 if (typeof passPropertyPhase === 'function') passPropertyPhase();
                 if (typeof nextPlayerPurchasePhase === 'function') nextPlayerPurchasePhase();
-                updatePurchasePhaseUI();
-                renderPropertySelect();
-                drawCircleBoard();
+                refreshUI();
                 return;
             }
             const propertyIndex = parseInt(select.value);
@@ -258,9 +288,7 @@ if (buyPropertyBtn) {
             if (typeof buyPropertyPhase === 'function') {
                 buyPropertyPhase(player, property);
                 if (typeof nextPlayerPurchasePhase === 'function') nextPlayerPurchasePhase();
-                updatePurchasePhaseUI();
-                renderPropertySelect();
-                drawCircleBoard();
+                refreshUI();
             }
         }
     };
@@ -273,9 +301,7 @@ if (passBtn) {
         if (typeof purchasePhase !== 'undefined' && purchasePhase) {
             if (typeof passPropertyPhase === 'function') passPropertyPhase();
             if (typeof nextPlayerPurchasePhase === 'function') nextPlayerPurchasePhase();
-            updatePurchasePhaseUI();
-            renderPropertySelect();
-            drawCircleBoard();
+            refreshUI();
         }
     };
 }
@@ -284,4 +310,88 @@ if (passBtn) {
 if (typeof updatePurchasePhaseUI === 'function') updatePurchasePhaseUI();
 if (typeof renderPropertySelect === 'function') renderPropertySelect();
 
-// ...他のUI描画・イベント関数も必要に応じてここに追加...
+// 盤面以外のUI要素（#gameInfo, #gameActions, #players など）を下にずらす
+window.addEventListener('DOMContentLoaded', () => {
+    const infoDiv = document.getElementById('gameInfo');
+    if (infoDiv) infoDiv.style.marginTop = '100px';
+    const actionsDiv = document.getElementById('gameActions');
+    if (actionsDiv) actionsDiv.style.marginTop = '100px';
+    const playersDiv = document.getElementById('players');
+    if (playersDiv) playersDiv.style.marginTop = '100px';
+});
+
+function updatePlayersInfo() {
+    const playersDiv = document.getElementById('players');
+    if (!playersDiv) return;
+    playersDiv.innerHTML = '';
+    if (typeof players !== 'undefined' && Array.isArray(players)) {
+        players.forEach((player, idx) => {
+            const div = document.createElement('div');
+            div.className = 'player-info';
+            // 所持物件名リストを取得
+            let propertyNames = player.properties && player.properties.length > 0
+                ? player.properties.map(p => {
+                    // 日本語名マッピング
+                    const nameMap = {
+                        "Brown Property 1": "地中海通り",
+                        "Brown Property 2": "バルティック通り",
+                        "Light Blue Property 1": "オリエンタル通り",
+                        "Light Blue Property 2": "バーモント通り",
+                        "Light Blue Property 3": "コネチカット通り",
+                        "Pink Property 1": "セントチャールズ通り",
+                        "Pink Property 2": "ステーツ通り",
+                        "Pink Property 3": "バージニア通り",
+                        "Orange Property 1": "セントジェームズ通り",
+                        "Orange Property 2": "テネシー通り",
+                        "Orange Property 3": "ニューヨーク通り",
+                        "Red Property 1": "ケンタッキー通り",
+                        "Red Property 2": "インディアナ通り",
+                        "Red Property 3": "イリノイ通り",
+                        "Yellow Property 1": "アトランティック通り",
+                        "Yellow Property 2": "ベンヴェント通り",
+                        "Yellow Property 3": "マービンガーデン",
+                        "Green Property 1": "パシフィック通り",
+                        "Green Property 2": "ノースカロライナ通り",
+                        "Green Property 3": "ペンシルバニア通り",
+                        "Blue Property 1": "パークプレイス",
+                        "Blue Property 2": "ボードウォーク",
+                        "Railroad Company 1": "鉄道会社1",
+                        "Railroad Company 2": "鉄道会社2",
+                        "Railroad Company 3": "鉄道会社3",
+                        "Railroad Company 4": "鉄道会社4",
+                        "Electric Company": "電力会社",
+                        "Water Works": "水道局"
+                    };
+                    // 色情報も表示
+                    return `${nameMap[p.name] || p.name}（${p.color}）`;
+                }).join(', ')
+                : 'なし';
+            div.textContent = `プレイヤー${player.id}: ${player.money}万円　物件: ${propertyNames}`;
+            if (idx === currentPlayerIndex) {
+                div.style.fontWeight = 'bold';
+                div.style.color = '#3498db';
+            }
+            playersDiv.appendChild(div);
+        });
+    }
+}
+
+// プレイヤー情報を毎ターン・物件購入時に必ず更新
+function refreshUI() {
+    drawCircleBoard();
+    updatePlayersInfo();
+    updateActionButtons();
+    updatePurchasePhaseUI();
+    renderPropertySelect();
+}
+
+function canNegotiate() {
+    // 1周目以降のみ交渉可能
+    if (typeof players === 'undefined' || players.length === 0) return false;
+    // boardCellsはdrawCircleBoard内で定義されているため、window.boardCellsとしてグローバル化している場合はそれを使う
+    const cells = typeof boardCells !== 'undefined' ? boardCells : (window.boardCells || []);
+    if (cells.length === 0) return false;
+    let minPosition = Math.min(...players.map(p => p.position));
+    let round = Math.floor(minPosition / cells.length) + 1;
+    return round >= 2;
+}

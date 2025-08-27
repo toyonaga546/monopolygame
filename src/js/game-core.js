@@ -59,11 +59,42 @@ function setupBoard() {
         { name: "Railroad Company 3", price: 200, color: "black" },
         // ...必要に応じて追加...
     ];
-    gameBoard = properties.map((property, index) => ({
-        ...property,
-        owner: null,
-        index: index,
-    }));
+    gameBoard = [
+        { name: "Brown Property 1", price: 100, color: "brown", owner: null, index: 0 },
+        { name: "Brown Property 2", price: 120, color: "brown", owner: null, index: 1 },
+        { name: "Light Blue Property 1", price: 140, color: "lightblue", owner: null, index: 2 },
+        { name: "Light Blue Property 2", price: 160, color: "lightblue", owner: null, index: 3 },
+        { name: "Light Blue Property 3", price: 180, color: "lightblue", owner: null, index: 4 },
+        { name: "Pink Property 1", price: 200, color: "pink", owner: null, index: 5 },
+        { name: "Pink Property 2", price: 220, color: "pink", owner: null, index: 6 },
+        { name: "Pink Property 3", price: 240, color: "pink", owner: null, index: 7 },
+        { name: "Orange Property 1", price: 260, color: "orange", owner: null, index: 8 },
+        { name: "Orange Property 2", price: 280, color: "orange", owner: null, index: 9 },
+        { name: "Orange Property 3", price: 300, color: "orange", owner: null, index: 10 },
+        { name: "Red Property 1", price: 320, color: "red", owner: null, index: 11 },
+        { name: "Red Property 2", price: 340, color: "red", owner: null, index: 12 },
+        { name: "Red Property 3", price: 360, color: "red", owner: null, index: 13 },
+        { name: "Yellow Property 1", price: 380, color: "yellow", owner: null, index: 14 },
+        { name: "Yellow Property 2", price: 400, color: "yellow", owner: null, index: 15 },
+        { name: "Yellow Property 3", price: 420, color: "yellow", owner: null, index: 16 },
+        { name: "Green Property 1", price: 440, color: "green", owner: null, index: 17 },
+        { name: "Green Property 2", price: 460, color: "green", owner: null, index: 18 },
+        { name: "Green Property 3", price: 480, color: "green", owner: null, index: 19 },
+        { name: "Blue Property 1", price: 500, color: "blue", owner: null, index: 20 },
+        { name: "Blue Property 2", price: 520, color: "blue", owner: null, index: 21 },
+        { name: "Railroad Company 1", price: 200, color: "black", owner: null, index: 22 },
+        { name: "Railroad Company 2", price: 200, color: "black", owner: null, index: 23 },
+        { name: "Railroad Company 3", price: 200, color: "black", owner: null, index: 24 },
+        { name: "Railroad Company 4", price: 200, color: "black", owner: null, index: 25 },
+        { name: "Electric Company", price: 150, color: "yellow", owner: null, index: 26 },
+        { name: "Water Works", price: 150, color: "yellow", owner: null, index: 27 },
+        { name: "Jail", price: 0, color: "gray", owner: null, index: 28 },
+        { name: "Start", price: 0, color: "white", owner: null, index: 29 },
+        { name: "Tax", price: 0, color: "gray", owner: null, index: 30 },
+        { name: "Luxury Tax", price: 0, color: "gray", owner: null, index: 31 },
+        { name: "Chance", price: 0, color: "orange", owner: null, index: 32 },
+        { name: "Community Chest", price: 0, color: "yellow", owner: null, index: 33 }
+    ];
 }
 
 function canBuyPropertyThisPhase(player, property) {
